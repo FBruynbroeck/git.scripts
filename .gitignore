@@ -2,7 +2,6 @@
 *.py[cod]
 .installed.cfg
 bin
-bootstrap.py
 develop-eggs
 include
 lib
