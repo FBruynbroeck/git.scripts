@@ -1,0 +1,11 @@
+Changelog
+=========
+
+0.1-dev (unreleased)
+--------------------
+
+- Add reload_hooks and remove_hooks scripts
+  [FBruynbroeck]
+
+- Package created using templer
+  [FBruynbroeck]
