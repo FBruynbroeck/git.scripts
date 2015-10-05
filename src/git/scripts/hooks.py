@@ -37,7 +37,7 @@ def gitInit(path):
 def removeGitHooksFolder(path):
     path = os.path.join(path, '.git', 'hooks')
     if os.path.exists(path):
-        print 'Remove Hooks repository in %s/.git' % path
+        print 'Remove Hooks repository in %s' % path
         removeFolder(path)
 
 
