@@ -22,11 +22,13 @@ setup(name='git.scripts',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'zest.releaser'
       ],
       entry_points={
           'console_scripts': [
               'reload_hooks = git.scripts.hooks:reload_hooks',
               'remove_hooks = git.scripts.hooks:remove_hooks',
+              'changelogrelease = git.scripts.release:change_log',
           ],
       }
       )
