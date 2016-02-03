@@ -8,6 +8,6 @@
 
 
 remove_hooks $1;
-fullrelease $1;
+fullrelease;
 reload_hooks $1;
 changelogrelease;
