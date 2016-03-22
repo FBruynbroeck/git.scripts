@@ -7,7 +7,7 @@
 #
 
 
-remove_hooks $1;
+remove_hooks ${1:-.};
 fullrelease;
-reload_hooks $1;
+reload_hooks ${1:-.};
 changelogrelease;
