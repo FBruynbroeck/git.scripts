@@ -6,6 +6,8 @@ Created by FBruynbroeck on 2015-09-22.
 Licensed under the GPL license, see LICENCE.txt for more details.
 Copyright by Affinitic sprl
 """
+from utils import gitFoldersPath
+
 import argparse
 import os
 import subprocess
@@ -18,15 +20,6 @@ def removeFolder(path):
         for name in dirs:
             os.rmdir(os.path.join(root, name))
     os.rmdir(path)
-
-
-def gitFoldersPath(path):
-    result = []
-    for dirpath, dirnames, files in os.walk(path):
-        for dirname in dirnames:
-            if dirname == '.git':
-                result.append(dirpath)
-    return result
 
 
 def gitInit(path):
