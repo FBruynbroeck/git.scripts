@@ -24,6 +24,7 @@ setup(name='git.scripts',
           'setuptools',
           'zest.releaser',
           'pyaml',
+          'GitPython',
       ],
       entry_points={
           'console_scripts': [

@@ -9,11 +9,15 @@ Copyright by Affinitic sprl
 import os
 import logging
 
+from git import Repo
+from git.scripts.hooks import gitInit
+from git.scripts.hooks import removeGitHooksFolder
 from zest.releaser import baserelease
 from zest.releaser import utils
 logger = logging.getLogger(__name__)
 BUILDOUT = os.environ.get('BUILDOUT')
 BUILDOUTHISTORYFILE = "%s/CHANGES.txt" % BUILDOUT
+LABEL = os.environ.get('LABEL')
 
 
 def getHistoryLines(vcs):
@@ -101,6 +105,16 @@ def extractHeadings(history_lines):
     return headings
 
 
+def commit_changes(package, trac_ids):
+    removeGitHooksFolder(BUILDOUT)
+    filename = '%s/versions_prod.cfg' % BUILDOUT
+    repo = Repo(path=BUILDOUT)
+    repo.git.add(BUILDOUTHISTORYFILE)
+    repo.git.add(filename)
+    repo.git.commit(m="Upgrade %s\n\nThis refs %s %s" % (package, LABEL, trac_ids))
+    gitInit(BUILDOUT)
+
+
 def change_log():
     utils.parse_options()
     utils.configure_logging()
@@ -131,3 +145,9 @@ def change_log():
         return
     updateBuildoutChangeLogs(history_lines, history_encoding, headings, changelogs, package, version)
     upgradeBuildoutVersion(package, version)
+    while True:
+        question = 'What are the trac identifiers ? '
+        trac_ids = utils.get_input(question)
+        if trac_ids:
+            break
+    commit_changes(package, trac_ids)
