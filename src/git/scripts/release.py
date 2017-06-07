@@ -6,15 +6,15 @@ Created by FBruynbroeck on 2015-09-29.
 Licensed under the GPL license, see LICENCE.txt for more details.
 Copyright by Affinitic sprl
 """
-import os
-import logging
-import re
-
 from git import Repo
 from git.scripts.hooks import gitInit
 from git.scripts.hooks import removeGitHooksFolder
 from zest.releaser import baserelease
 from zest.releaser import utils
+
+import logging
+import os
+import re
 logger = logging.getLogger(__name__)
 BUILDOUT = os.environ.get('BUILDOUT')
 BUILDOUTHISTORYFILE = "%s/CHANGES.txt" % BUILDOUT
