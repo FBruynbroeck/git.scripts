@@ -8,6 +8,7 @@ Copyright by Affinitic sprl
 """
 import os
 import logging
+import re
 
 from git import Repo
 from git.scripts.hooks import gitInit
@@ -30,18 +31,21 @@ def getHistoryLines(vcs):
 
 
 def getCurrentChangeLogs(history_lines, headings):
-    i = 0
+    first_line = None
+    second_line = 1
+    version = None
     for heading in headings:
-        i += 1
-        if heading['date'] != 'unreleased':
-            first = heading
+        if re.match('\d+-\d+-\d+', heading['date']):
+            if not first_line:
+                first_line = heading['line']
+                version = heading['version']
+                continue
+            second_line = heading['line']
             break
-    if len(headings) == i:
+    if not version:
         logger.warn("No release version")
         return
-    second = headings[i]
-    changelogs = history_lines[first['line']+2:second['line']-2]
-    version = first['version']
+    changelogs = history_lines[first_line + 2:second_line - 2]
     return changelogs, version
 
 
