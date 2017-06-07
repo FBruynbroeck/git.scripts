@@ -65,9 +65,9 @@ def updateBuildoutChangeLogs(history_lines, history_encoding, headings, changelo
         indentchangelogs.append(changelog)
     inject.extend(indentchangelogs)
     inject.append('')
-    if history_lines[inject_location+3] == '- Nothing changed yet.':
-        del history_lines[inject_location+3:inject_location+6]
-    history_lines[inject_location+2:inject_location+2] = inject
+    if history_lines[inject_location + 3] == '- Nothing changed yet.':
+        del history_lines[inject_location + 3:inject_location + 6]
+    history_lines[inject_location + 2:inject_location + 2] = inject
     contents = u'\n'.join(history_lines)
     utils.write_text_file(BUILDOUTHISTORYFILE, contents, history_encoding)
 
