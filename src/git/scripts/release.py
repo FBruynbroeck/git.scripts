@@ -154,4 +154,5 @@ def change_log():
         trac_ids = utils.get_input(question)
         if trac_ids:
             break
+    trac_ids = ["#%s" % trac_ids, trac_ids][trac_ids.startswith("#")]
     commit_changes(package, trac_ids)
