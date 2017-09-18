@@ -10,4 +10,8 @@
 remove_hooks ${1:-.};
 fullrelease;
 reload_hooks ${1:-.};
-changelogrelease;
+for buildout in $BUILDOUT
+do
+    echo "Changelog for $buildout";
+    BUILDOUT=$buildout changelogrelease;
+done

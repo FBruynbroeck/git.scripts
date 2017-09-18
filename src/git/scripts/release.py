@@ -21,6 +21,25 @@ BUILDOUTHISTORYFILE = "%s/CHANGES.txt" % BUILDOUT
 LABEL = os.environ.get('LABEL')
 
 
+def getVersionPath():
+    filename = '%s/versions_prod.cfg' % BUILDOUT
+    if not os.path.isfile(filename):
+        filename = '%s/versions.cfg' % BUILDOUT
+    return filename
+
+
+def getCurrentVersion(package):
+    # Read in the file
+    filedata = None
+    filename = getVersionPath()
+    with open(filename, 'r') as file:
+        filedata = file.read()
+    filedata = filedata.split('\n')
+    for line in filedata:
+        if package in line:
+            return re.findall('[^=]+$', line)[0].replace(' ', '')
+
+
 def getHistoryLines(vcs):
     history = vcs.history_file()
     if not history:
@@ -30,23 +49,33 @@ def getHistoryLines(vcs):
     return history_lines, history_encoding
 
 
-def getCurrentChangeLogs(history_lines, headings):
-    first_line = None
-    second_line = 1
-    version = None
+def getOldversions(headings, package):
+    version = getCurrentVersion(package)
+    versions = []
     for heading in headings:
         if re.match('\d+-\d+-\d+', heading['date']):
-            if not first_line:
+            if str(heading['version']) == str(version):
+                break
+            versions.append(heading['version'])
+    versions.sort()
+    return versions
+
+
+def getChangeLogs(history_lines, headings, package):
+    versions = getOldversions(headings, package)
+    logs = []
+    for version in versions:
+        first_line = None
+        second_line = 1
+        for i, heading in enumerate(headings):
+            if str(heading['version']) == str(version):
                 first_line = heading['line']
-                version = heading['version']
-                continue
-            second_line = heading['line']
-            break
-    if not version:
-        logger.warn("No release version")
-        return
-    changelogs = history_lines[first_line + 2:second_line - 2]
-    return changelogs, version
+                break
+        if len(headings) > (i + 1):
+            second_line = headings[i + 1]['line']
+        changelogs = history_lines[first_line + 2:second_line - 2]
+        logs.append((changelogs, version))
+    return logs
 
 
 def getBuildoutHistoryLines():
@@ -75,7 +104,7 @@ def updateBuildoutChangeLogs(history_lines, history_encoding, headings, changelo
 def upgradeBuildoutVersion(package, version):
     # Read in the file
     filedata = None
-    filename = '%s/versions_prod.cfg' % BUILDOUT
+    filename = getVersionPath()
     with open(filename, 'r') as file:
         filedata = file.read()
     filedata = filedata.split('\n')
@@ -111,7 +140,7 @@ def extractHeadings(history_lines):
 
 def commit_changes(package, trac_ids):
     removeGitHooksFolder(BUILDOUT)
-    filename = '%s/versions_prod.cfg' % BUILDOUT
+    filename = getVersionPath()
     repo = Repo(path=BUILDOUT)
     repo.git.add(BUILDOUTHISTORYFILE)
     repo.git.add(filename)
@@ -140,19 +169,22 @@ def change_log():
     headings = extractHeadings(history_lines)
     if not headings:
         return
-    changelogs, version = getCurrentChangeLogs(history_lines, headings)
+    changelogs = getChangeLogs(history_lines, headings, package)
 
     # Master Buildout
     history_lines, history_encoding = getBuildoutHistoryLines()
     headings = extractHeadings(history_lines)
     if not headings:
         return
-    updateBuildoutChangeLogs(history_lines, history_encoding, headings, changelogs, package, version)
-    upgradeBuildoutVersion(package, version)
-    while True:
-        question = 'What are the trac identifiers ? '
-        trac_ids = utils.get_input(question)
-        if trac_ids:
-            break
-    trac_ids = ["#%s" % trac_ids, trac_ids][trac_ids.startswith("#")]
-    commit_changes(package, trac_ids)
+    version = None
+    for changelog, version in changelogs:
+        updateBuildoutChangeLogs(history_lines, history_encoding, headings, changelog, package, version)
+    if version:
+        upgradeBuildoutVersion(package, version)
+        while True:
+            question = 'What are the trac identifiers ? '
+            trac_ids = utils.get_input(question)
+            if trac_ids:
+                break
+        trac_ids = ["#%s" % trac_ids, trac_ids][trac_ids.startswith("#")]
+        commit_changes(package, trac_ids)
