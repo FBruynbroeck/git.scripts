@@ -52,11 +52,14 @@ def getHistoryLines(vcs):
 def getOldversions(headings, package):
     version = getCurrentVersion(package)
     versions = []
-    for heading in headings:
-        if re.match('\d+-\d+-\d+', heading['date']):
-            if str(heading['version']) == str(version):
-                break
-            versions.append(heading['version'])
+    if version not in [heading['version'] for heading in headings]:
+        logger.warn("It's not possible to downgrade version")
+    else:
+        for heading in headings:
+            if re.match('\d+-\d+-\d+', heading['date']):
+                if str(heading['version']) == str(version):
+                    break
+                versions.append(heading['version'])
     versions.sort()
     return versions
 
