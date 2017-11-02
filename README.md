@@ -1,12 +1,25 @@
 Git Scripts
 ===========
 
-Reload Hooks:
+## Installation
 ```
-bin/reload_hooks .
+virtualenv-2.7 .
+bin/python bootstrap.py
+bin/buildout
+bin/install-links
 ```
 
-Remove Hooks:
+## Reload Hooks
 ```
-bin/remove_hooks .
+reload_hooks .
+```
+
+## Remove Hooks
+```
+remove_hooks .
+```
+
+## Custom fullrelease
+```
+fullrelease.sh
 ```
