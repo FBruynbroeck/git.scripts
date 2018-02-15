@@ -3,10 +3,8 @@ Git Scripts
 
 ## Installation
 ```
-virtualenv-2.7 .
-bin/python bootstrap.py
-bin/buildout
-bin/install-links
+./bootstrap.sh
+sudo bin/install-links
 ```
 
 ## Reload Hooks
